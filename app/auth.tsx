@@ -3,8 +3,31 @@ import { COLORS } from '../constants'
 import { VStack, Text, Input, Button, HStack } from 'native-base'
 import { Stack } from 'expo-router'
 
+function validateEmail(email: string) {
+  var re = /\S+@\S+\.\S+/
+  return re.test(email)
+}
+
 export default function Index() {
   const [isSignUp, setIsSignUp] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
+  function onAuthPress() {
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email')
+      return
+    }
+
+    if (isSignUp) {
+    } else {
+    }
+  }
+
+  const isAuthButtonDisabled = isSignUp
+    ? Boolean(email || password || confirmPassword)
+    : Boolean(email || password)
 
   return (
     <>
@@ -18,9 +41,9 @@ export default function Index() {
         bgColor={COLORS.brown}
         height="100%"
         width="100%"
-        pt={4.5}
+        pt={5}
         px={7}
-        space={0.5}
+        space={4}
         alignItems="center"
       >
         <Text color={COLORS.orange} fontSize={32} fontWeight={800}>
@@ -29,7 +52,7 @@ export default function Index() {
         <VStack
           pt={4}
           px={5}
-          height="4/6"
+          height="5/6"
           borderRadius={6}
           bgColor={COLORS.pink}
           width="100%"
@@ -53,6 +76,8 @@ export default function Index() {
                 borderWidth={0}
                 fontWeight={500}
                 fontSize={14}
+                onChangeText={(text) => setEmail(text)}
+                type="text"
               />
             </VStack>
 
@@ -69,6 +94,8 @@ export default function Index() {
                 borderWidth={0}
                 fontWeight={500}
                 fontSize={14}
+                onChangeText={(text) => setPassword(text)}
+                type="password"
               />
             </VStack>
 
@@ -86,6 +113,8 @@ export default function Index() {
                   borderWidth={0}
                   fontWeight={500}
                   fontSize={14}
+                  onChangeText={(text) => setConfirmPassword(text)}
+                  type="password"
                 />
               </VStack>
             )}
@@ -94,12 +123,20 @@ export default function Index() {
           <VStack mt={10} space={4}>
             <Button
               bgColor={COLORS.brown}
-              color={COLORS.orange}
               shadow="3"
               borderRadius={2}
-              p={2}
+              alignSelf="center"
+              onPress={onAuthPress}
+              disabled={isAuthButtonDisabled}
             >
-              <Text>{isSignUp ? 'Sign Up' : 'Sign In'}</Text>
+              <Text
+                color={COLORS.orange}
+                fontWeight={600}
+                fontSize={16}
+                borderRadius={2}
+              >
+                {isSignUp ? 'Sign Up' : 'Sign In'}
+              </Text>
             </Button>
 
             <HStack space={1} color={COLORS.brown} alignItems="center">
@@ -108,7 +145,11 @@ export default function Index() {
                   ? 'Already have an account?'
                   : "Don't have an account?"}
               </Text>
-              <Button onPress={() => setIsSignUp(!isSignUp)} variant="ghost">
+              <Button
+                p={0}
+                onPress={() => setIsSignUp(!isSignUp)}
+                variant="ghost"
+              >
                 <Text color={COLORS.brown} underline>
                   {isSignUp ? 'Sign in!' : 'Sign up!'}
                 </Text>
