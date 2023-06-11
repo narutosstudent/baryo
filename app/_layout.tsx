@@ -1,6 +1,7 @@
 import React from 'react'
 import { NativeBaseProvider, extendTheme } from 'native-base'
 import { Stack } from 'expo-router'
+import Toast from 'react-native-toast-message'
 import { COLORS } from '../constants'
 
 const theme = extendTheme({
@@ -20,8 +21,11 @@ declare module 'native-base' {
 
 export default function Layout() {
   return (
-    <NativeBaseProvider theme={theme}>
-      <Stack initialRouteName="/auth" />
-    </NativeBaseProvider>
+    <>
+      <Toast />
+      <NativeBaseProvider theme={theme}>
+        <Stack initialRouteName="/auth" />
+      </NativeBaseProvider>
+    </>
   )
 }

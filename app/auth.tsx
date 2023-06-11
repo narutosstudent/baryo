@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { COLORS } from '../constants'
 import { VStack, Text, Input, Button, HStack } from 'native-base'
+import Toast from 'react-native-toast-message'
 import { Stack } from 'expo-router'
 
 function validateEmail(email: string) {
@@ -16,7 +17,12 @@ export default function Index() {
 
   function onAuthPress() {
     if (!validateEmail(email)) {
-      alert('Please enter a valid email')
+      Toast.show({
+        position: 'top',
+        text1: 'The email is invalid.',
+        type: 'error',
+      })
+
       return
     }
 
@@ -26,8 +32,10 @@ export default function Index() {
   }
 
   const isAuthButtonDisabled = isSignUp
-    ? Boolean(email || password || confirmPassword)
-    : Boolean(email || password)
+    ? Boolean(!email || !password || !confirmPassword)
+    : Boolean(!email || !password)
+
+  console.log('isAuthButtonDisabled', isAuthButtonDisabled)
 
   return (
     <>
@@ -127,7 +135,10 @@ export default function Index() {
               borderRadius={2}
               alignSelf="center"
               onPress={onAuthPress}
-              disabled={isAuthButtonDisabled}
+              isDisabled={isAuthButtonDisabled}
+              _disabled={{
+                opacity: 0.5,
+              }}
             >
               <Text
                 color={COLORS.orange}
