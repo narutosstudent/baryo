@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { COLORS } from '../constants'
-import { VStack, Text, Input, Button, HStack } from 'native-base'
+import { VStack, Text, Input, Button, HStack, Spinner } from 'native-base'
 import { useToast } from 'react-native-toast-notifications'
 import { Stack, useRouter } from 'expo-router'
 import {
@@ -19,17 +19,20 @@ export default function Index() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const toast = useToast()
 
   const router = useRouter()
 
   async function onAuthPress() {
+    setIsLoading(true)
     if (!validateEmail(email)) {
       toast.show('Invalid email address!', {
         type: 'error',
       })
 
+      setIsLoading(false)
       return
     }
 
@@ -40,11 +43,14 @@ export default function Index() {
           type: 'success',
         })
 
+        setIsLoading(false)
         router.push('/dashboard')
       } catch (error) {
         toast.show('Something went wrong!', {
           type: 'error',
         })
+
+        setIsLoading(false)
       }
     } else {
       try {
@@ -53,11 +59,14 @@ export default function Index() {
           type: 'success',
         })
 
+        setIsLoading(false)
         router.push('/dashboard')
       } catch (error) {
         toast.show('Something went wrong!', {
           type: 'error',
         })
+
+        setIsLoading(false)
       }
     }
   }
@@ -65,8 +74,6 @@ export default function Index() {
   const isAuthButtonDisabled = isSignUp
     ? Boolean(!email || !(password.length > 5 && password === confirmPassword))
     : Boolean(!email || password.length < 6)
-
-  console.log('isAuthButtonDisabled', isAuthButtonDisabled)
 
   return (
     <>
@@ -166,19 +173,23 @@ export default function Index() {
               borderRadius={2}
               alignSelf="center"
               onPress={onAuthPress}
-              isDisabled={isAuthButtonDisabled}
+              isDisabled={isAuthButtonDisabled || isLoading}
               _disabled={{
                 opacity: 0.5,
               }}
             >
-              <Text
-                color={COLORS.orange}
-                fontWeight={600}
-                fontSize={16}
-                borderRadius={2}
-              >
-                {isSignUp ? 'Sign Up' : 'Sign In'}
-              </Text>
+              {isLoading ? (
+                <Spinner color={COLORS.orange} />
+              ) : (
+                <Text
+                  color={COLORS.orange}
+                  fontWeight={600}
+                  fontSize={16}
+                  borderRadius={2}
+                >
+                  {isSignUp ? 'Sign Up' : 'Sign In'}
+                </Text>
+              )}
             </Button>
 
             <HStack space={1} color={COLORS.brown} alignItems="center">

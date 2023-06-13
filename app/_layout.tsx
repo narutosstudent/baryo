@@ -1,8 +1,10 @@
 import React from 'react'
 import { NativeBaseProvider, extendTheme } from 'native-base'
-import { Stack } from 'expo-router'
+import { Stack, useRouter } from 'expo-router'
 import { ToastProvider } from 'react-native-toast-notifications'
 import { COLORS } from '../constants'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../firebaseConfig'
 
 const theme = extendTheme({
   colors: {
@@ -20,6 +22,16 @@ declare module 'native-base' {
 }
 
 export default function Layout() {
+  const router = useRouter()
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth')
+    }
+  })
+
   return (
     <ToastProvider placement="top">
       <NativeBaseProvider theme={theme}>
