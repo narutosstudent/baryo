@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { COLORS } from '../constants'
 import { VStack, Text, Input, Button, HStack } from 'native-base'
-import Toast from 'react-native-toast-message'
-import { Stack } from 'expo-router'
+import { useToast } from 'react-native-toast-notifications'
+import { Stack, useRouter } from 'expo-router'
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth'
+import { auth } from '../firebaseConfig'
 
 function validateEmail(email: string) {
   var re = /\S+@\S+\.\S+/
@@ -15,11 +20,13 @@ export default function Index() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  function onAuthPress() {
+  const toast = useToast()
+
+  const router = useRouter()
+
+  async function onAuthPress() {
     if (!validateEmail(email)) {
-      Toast.show({
-        position: 'top',
-        text1: 'The email is invalid.',
+      toast.show('Invalid email address!', {
         type: 'error',
       })
 
@@ -27,13 +34,37 @@ export default function Index() {
     }
 
     if (isSignUp) {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password)
+        toast.show('Successfully signed up.', {
+          type: 'success',
+        })
+
+        router.push('/dashboard')
+      } catch (error) {
+        toast.show('Something went wrong!', {
+          type: 'error',
+        })
+      }
     } else {
+      try {
+        await signInWithEmailAndPassword(auth, email, password)
+        toast.show('Successfully signed in.', {
+          type: 'success',
+        })
+
+        router.push('/dashboard')
+      } catch (error) {
+        toast.show('Something went wrong!', {
+          type: 'error',
+        })
+      }
     }
   }
 
   const isAuthButtonDisabled = isSignUp
-    ? Boolean(!email || !password || !confirmPassword)
-    : Boolean(!email || !password)
+    ? Boolean(!email || !(password.length > 5 && password === confirmPassword))
+    : Boolean(!email || password.length < 6)
 
   console.log('isAuthButtonDisabled', isAuthButtonDisabled)
 
